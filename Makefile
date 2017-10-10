@@ -1,6 +1,10 @@
 PYTHON = python
 PROG = dancing-bear
 
+ARDUINO = /Applications/Arduino.app/Contents/MacOS/Arduino
+ARDUINO_PORT = /dev/cu.usbmodem1451
+ARDUINO_SRC = ./src/arduino/bear.ino
+
 build:
 	$(PYTHON) setup.py build
 
@@ -31,10 +35,8 @@ clean:
 console:
 	cd src && $(PYTHON)
 
-register:
-	$(PYTHON) setup.py register
+upload:
+	$(ARDUINO) --port $(ARDUINO_PORT) --upload $(ARDUINO_SRC) 2>&1 | egrep -v '^\s*at java|JmDNS|No route to host'
 
-publish:
-	$(PYTHON) setup.py sdist upload
+.PHONY: build install uninstall dev_install dev_uninstall pep8 test coverage clean console upload
 
-.PHONY: build install uninstall dev_install dev_uninstall pep8 test coverage clean console register publish

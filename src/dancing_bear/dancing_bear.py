@@ -1,8 +1,10 @@
 import sys
+import time
 from datetime import datetime
 import signal
 
 from mog_commons.terminal import TerminalHandler
+from .bear_controller import BearController
 
 MAX_BPM = 300
 
@@ -26,6 +28,8 @@ def main():
         tm = None
         count = 0
         ts = []
+        bpm = 0
+        num_beats = 0
         while True:
             ch = t.getch()
             tt = datetime.now()
@@ -55,10 +59,8 @@ def main():
                         count = 0
                     else:
                         bpm = round(60 / average_elapsed)
-                        print('BPM: %d, #Beats: %d' % (bpm, len(ts)))
-
-                    # auto play
-                    # todo
+                        num_beats = len(ts)
+                        print('BPM: %d, #Beats: %d' % (bpm, num_beats))
                         break
             elif ch == 'j' and count:
                 count += 1
@@ -68,10 +70,23 @@ def main():
             if ch == 'q':
                 break
             tm = tt
+        
+        # play sound
+        controller = BearController()
+
+        while True:
+            for i in range(num_beats):
+                controller.flash_led()
+                time.sleep(60 / bpm)
+
+        while True:
+            ch = t.getch()
+            if ch == 'q':
+                break
+
     finally:
         t.restore_terminal(None, None)
 
 def play_sound(bpm, num_beats):
     # todo
     pass
-
