@@ -4,6 +4,7 @@ import signal
 
 from mog_commons.terminal import TerminalHandler
 
+MAX_BPM = 300
 
 def main():
     """
@@ -40,11 +41,17 @@ def main():
 
                     # check if valid
                     average_elapsed = sum(ts) / len(ts)
+                    bpm = round(60 / average_elapsed)
 
                     if any(map(lambda x:  abs(1 -  x / average_elapsed) > 0.2, ts)):
                         # not constant beat
                         t.clear()
                         print('Beats are not constant. Please retry.')
+                        count = 0
+                    elif (bpm > MAX_BPM):
+                        # bpm too high
+                        t.clear()
+                        print('BPM too high: %d (Max: %d)' % (bpm, MAX_BPM))
                         count = 0
                     else:
                         bpm = round(60 / average_elapsed)
@@ -63,3 +70,8 @@ def main():
             tm = tt
     finally:
         t.restore_terminal(None, None)
+
+def play_sound(bpm, num_beats):
+    # todo
+    pass
+

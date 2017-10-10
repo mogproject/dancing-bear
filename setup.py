@@ -24,6 +24,7 @@ setup(
         'pytz',
         'tzlocal',
         'argparse',
+        'pyserial',
         'mog-commons >= 0.1.3',
     ],
     tests_require=[
