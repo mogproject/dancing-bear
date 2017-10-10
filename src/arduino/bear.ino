@@ -17,7 +17,7 @@ int currentBeat = 0;
 // the loop function runs over and over again forever
 void loop() {
   if (intervalMillis == 0) return;
-  
+
   unsigned long currentMillis = millis();
 
   // catch signal
@@ -25,6 +25,12 @@ void loop() {
     // read serial input
     byte x = Serial.read();
     byte y = Serial.read();
+
+    // stop working if the first byte is zero
+    if (x == 0) {
+      intervalMillis = 0;
+      return;
+    }
 
     // update variables
     previousMillis = currentMillis;
