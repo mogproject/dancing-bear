@@ -7,6 +7,7 @@ from mog_commons.terminal import TerminalHandler
 from .bear_controller import BearController
 
 MAX_BPM = 300
+MIN_BPM = 40
 
 def main():
     """
