@@ -5,6 +5,7 @@ import signal
 
 from mog_commons.terminal import TerminalHandler
 from .bear_controller import BearController
+from .midi_controller import MidiController
 
 MAX_BPM = 255
 MIN_BPM = 40
@@ -18,6 +19,7 @@ def main():
     signal.signal(signal.SIGTERM, t.restore_terminal)
     try:
         controller = BearController()
+        midi = MidiController()
 
         t.clear()
         print('\n'.join([
@@ -41,6 +43,7 @@ def main():
                 if (count < 1):
                     t.clear()
                     print('1')
+                    midi.play_downbeat()
                     count = 1
                     ts.clear()
                 else:
@@ -73,6 +76,7 @@ def main():
             elif ch == 'j' and count:
                 count += 1
                 print(count)
+                midi.play_upbeat()
                 ts.append((tt - tm).total_seconds())
 
             if ch == 'q':

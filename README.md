@@ -6,5 +6,7 @@ Dancing Bear
 
 ```
 pip2 install ino
+brew install gbevin/tools/sendmidi
+# install SympleSynth
 ```
 
