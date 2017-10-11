@@ -8,9 +8,7 @@ class BearController(object):
         self.ser = serial.Serial(port, baud_rate, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE)
 
     def start(self, bpm, num_beats):
-        print('start!')
-        ser = serial.Serial(self.port, self.baud_rate, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE)
-        ser.write(bytearray([bpm, num_beats]))
+        self.ser.write(bytearray([bpm, num_beats]))
 
     def stop(self):
         self.ser.write(bytearray([0, 0]))
