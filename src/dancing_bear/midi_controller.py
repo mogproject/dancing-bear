@@ -1,4 +1,4 @@
-from mog_commons.command import execute_command
+from mog_commons.command import execute_command, capture_command
 import os
 import signal
 import subprocess
@@ -12,6 +12,12 @@ class MidiController:
 
     def __init__(self, port='SimpleSynth virtual input'):
         self.port = port
+
+        # check deivce
+        rc, stdout, stderr = capture_command(['sendmidi', 'list'])
+        if port not in str(stdout, 'utf-8').splitlines(False):
+            raise RuntimeError('MIDI device not found.')
+
         xs = ['sendmidi', 'dev', self.port, 'ch', MidiController.CH_DRUMS, 'on']
         self.downbeat_args = xs + [MidiController.NOTE_DOWNBEAT, MidiController.NOTE_VELOCITY]
         self.upbeat_args = xs + [MidiController.NOTE_UPBEAT, MidiController.NOTE_VELOCITY]
@@ -30,5 +36,8 @@ class MidiController:
 
     def stop_play(self):
         if (self.midi_pid is not None):
-            os.killpg(os.getpgid(self.midi_pid), signal.SIGTERM)
+            try:
+                os.killpg(os.getpgid(self.midi_pid), signal.SIGTERM)
+            except Exception:
+                pass
             self.midi_pid = None

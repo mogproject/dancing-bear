@@ -15,8 +15,20 @@ def main():
     t = TerminalHandler(getch_repeat_threshold=0.05)
     signal.signal(signal.SIGTERM, t.restore_terminal)
     try:
-        # rec = BPMRecorder(t, MidiController(), BearController())
-        rec = BPMRecorder(t, MidiController(), None)
+        mc = None
+        bc = None
+
+        try:
+            mc = MidiController()
+        except Exception:
+            pass
+
+        try:
+            bc = BearController()
+        except Exception:
+            pass
+
+        rec = BPMRecorder(t, mc, bc)
         rec.loop()
     finally:
         t.restore_terminal(None, None)
