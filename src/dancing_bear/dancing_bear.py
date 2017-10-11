@@ -1,5 +1,3 @@
-import sys
-import time
 import signal
 
 from mog_commons.terminal import TerminalHandler
