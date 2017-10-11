@@ -40,6 +40,7 @@ void loop() {
     // stop working if the first byte is zero
     if (x == 0) {
       interval_millis = 0;
+      stop_beat();
       return;
     }
 
@@ -50,22 +51,17 @@ void loop() {
     current_beat = 0;
 
     flash_beat(true);
-  } else if (interval_millis == 0) {
-    stop_beat();
-    return; 
-  } else {
-    if (current_millis - previous_millis >= interval_millis) {
-      previous_millis += interval_millis;
-      current_beat = (current_beat + 1) % num_beats;
-      flash_beat(current_beat == 0);
-    }
+  } else if (interval_millis != 0 && current_millis - previous_millis >= interval_millis) {
+    previous_millis += interval_millis;
+    current_beat = (current_beat + 1) % num_beats;
+    flash_beat(current_beat == 0);
   }
 }
 
 void flash_beat(bool is_downbeat) {
   digitalWrite(LED_BUILTIN, HIGH);
   digitalWrite(is_downbeat ? RED : BLUE, HIGH);
-  delay(is_downbeat ? 300 : 150);
+  delay(is_downbeat ? 200 : 150);
   digitalWrite(LED_BUILTIN, LOW);
   digitalWrite(is_downbeat ? RED : BLUE, LOW);
 }
