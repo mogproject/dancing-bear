@@ -20,6 +20,9 @@ dev-install:
 dev-uninstall:
 	$(PYTHON) setup.py develop -u
 
+run: dev-install
+	$(PROG)
+
 pep8:
 	pep8 --max-line-length 120 --ignore E402,E731 src tests
 
@@ -38,5 +41,5 @@ console:
 upload:
 	$(ARDUINO) --port $(ARDUINO_PORT) --upload $(ARDUINO_SRC) 2>&1 | egrep -v '^\s*at java|JmDNS|No route to host'
 
-.PHONY: build install uninstall dev_install dev_uninstall pep8 test coverage clean console upload
+.PHONY: build install uninstall dev_install dev_uninstall run pep8 test coverage clean console upload
 
