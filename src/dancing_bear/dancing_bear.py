@@ -22,8 +22,8 @@ def main():
         t.clear()
         print('\n'.join([
             'Usage:',
-            '[k]: Start and finish the beat',
-            '[j]: Record inner beats',
+            '[k]: Start and finish recording',
+            '[j]: Record upbeats',
             '[q]: Quit this program',
             '',
         ]))

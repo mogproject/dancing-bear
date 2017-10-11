@@ -8,15 +8,15 @@ void setup() {
 
 
 // variables
-unsigned long previousMillis = 0;
-unsigned long intervalMillis = 0;
-int numBeats = 4;
-int currentBeat = 0;
+unsigned long previous_millis = 0;
+unsigned long interval_millis = 0;
+int num_beats = 4;
+int current_beat = 0;
 
 
 // the loop function runs over and over again forever
 void loop() {
-  unsigned long currentMillis = millis();
+  unsigned long current_millis = millis();
 
   // catch signal
   if (Serial.available() >= 2) {
@@ -26,31 +26,31 @@ void loop() {
 
     // stop working if the first byte is zero
     if (x == 0) {
-      intervalMillis = 0;
+      interval_millis = 0;
       return;
     }
 
     // update variables
-    previousMillis = currentMillis;
-    intervalMillis = (60L * 1000) / (unsigned long)x;
-    numBeats = (int)y;
-    currentBeat = 0;
+    previous_millis = current_millis;
+    interval_millis = (60L * 1000) / (unsigned long)x;
+    num_beats = (int)y;
+    current_beat = 0;
 
     flash_beat(true);
-  } else if (intervalMillis == 0) {
+  } else if (interval_millis == 0) {
     digitalWrite(LED_BUILTIN, LOW);
     return; 
   } else {
-    if (currentMillis - previousMillis >= intervalMillis) {
-      previousMillis += intervalMillis;
-      currentBeat = (currentBeat + 1) % numBeats;
-      flash_beat(currentBeat == 0);
+    if (current_millis - previous_millis >= interval_millis) {
+      previous_millis += interval_millis;
+      current_beat = (current_beat + 1) % num_beats;
+      flash_beat(current_beat == 0);
     }
   }
 }
 
-void flash_beat(bool is_major) {
+void flash_beat(bool is_downbeat) {
   digitalWrite(LED_BUILTIN, HIGH);
-  delay(is_major ? 300 : 150);
+  delay(is_downbeat ? 300 : 150);
   digitalWrite(LED_BUILTIN, LOW);
 }
