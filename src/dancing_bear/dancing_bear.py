@@ -6,7 +6,7 @@ import signal
 from mog_commons.terminal import TerminalHandler
 from .bear_controller import BearController
 
-MAX_BPM = 300
+MAX_BPM = 255
 MIN_BPM = 40
 
 def main():
@@ -17,6 +17,8 @@ def main():
     t = TerminalHandler(getch_repeat_threshold=0.05)
     signal.signal(signal.SIGTERM, t.restore_terminal)
     try:
+        controller = BearController()
+
         t.clear()
         print('\n'.join([
             'Usage:',
@@ -58,6 +60,11 @@ def main():
                         t.clear()
                         print('BPM too high: %d (Max: %d)' % (bpm, MAX_BPM))
                         count = 0
+                    elif (bpm < MIN_BPM):
+                        # bpm too low
+                        t.clear()
+                        print('BPM too low: %d (Min: %d)' % (bpm, MIN_BPM))
+                        count = 0
                     else:
                         bpm = round(60 / average_elapsed)
                         num_beats = len(ts)
@@ -73,16 +80,13 @@ def main():
             tm = tt
         
         # play sound
-        controller = BearController()
+        controller.start(bpm, num_beats)
 
         while True:
-            for i in range(num_beats):
-                controller.flash_led()
-                time.sleep(60 / bpm)
-
-        while True:
+            print('Press [Q] to quit.')
             ch = t.getch()
             if ch == 'q':
+                controller.stop()
                 break
 
     finally:

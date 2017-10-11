@@ -16,8 +16,6 @@ int currentBeat = 0;
 
 // the loop function runs over and over again forever
 void loop() {
-  if (intervalMillis == 0) return;
-
   unsigned long currentMillis = millis();
 
   // catch signal
@@ -38,28 +36,21 @@ void loop() {
     numBeats = (int)y;
     currentBeat = 0;
 
-    flash_major_beat();
+    flash_beat(true);
+  } else if (intervalMillis == 0) {
+    digitalWrite(LED_BUILTIN, LOW);
+    return; 
   } else {
     if (currentMillis - previousMillis >= intervalMillis) {
       previousMillis += intervalMillis;
       currentBeat = (currentBeat + 1) % numBeats;
-      if (currentBeat == 0) {
-        flash_major_beat();
-      } else {
-        flash_minor_beat();
-      }
+      flash_beat(currentBeat == 0);
     }
   }
 }
 
-void flash_major_beat() {
+void flash_beat(bool is_major) {
   digitalWrite(LED_BUILTIN, HIGH);
-  delay(300);
-  digitalWrite(LED_BUILTIN, LOW);
-}
-
-void flash_minor_beat() {
-  digitalWrite(LED_BUILTIN, HIGH);
-  delay(150);
+  delay(is_major ? 300 : 150);
   digitalWrite(LED_BUILTIN, LOW);
 }
