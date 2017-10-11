@@ -57,7 +57,12 @@ class BPMRecorder:
                     self._print_message('Playing: BPM=%d, #Beats=%d' % (bpm, num_beats))
                     self._start_play(bpm, num_beats)
                 count = 0
-            elif ch == 'j' and count:
+
+            elif ch == 'j' and count == 0:
+                self._stop_play()
+                self._print_header()
+
+            elif ch == 'j':
                 # Record upbeats
                 time_recorded.append((current_time - last_recorded).total_seconds())
 
@@ -74,7 +79,7 @@ class BPMRecorder:
 
     def _print_header(self):
         self.term.clear()
-        print('[Q] Quit [K] Start/stop recording [J] Record upbeat\n')
+        print('[Q] Quit   [K] Start/stop recording   [J] Record upbeat\n')
 
     def _print_message(self, message):
         self._print_header()
