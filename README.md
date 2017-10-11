@@ -1,12 +1,20 @@
 # dancing-bear
+
 Dancing Bear
 
 
 ## Setup
 
+- Install and launch SimpleSynth
+
 ```
-pip2 install ino
 brew install gbevin/tools/sendmidi
-# install SympleSynth
+
+```
+
+## Testing
+
+```
+make run
 ```
 
