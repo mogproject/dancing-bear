@@ -19,21 +19,42 @@ void setup() {
   digitalWrite(BLUE, LOW);
 }
 
+
+// variables
+unsigned long previous_millis = 0;
+unsigned long interval_millis = 0;
+int num_beats = 4;
+int current_beat = 0;
+
+
 // the loop function runs over and over again forever
 void loop() {
+  unsigned long current_millis = millis();
+
   // catch signal
-  if (Serial.available()) {
+  if (Serial.available() >= 2) {
     // read serial input
-    switch (Serial.read()) {
-    case 0:
-      flash_beat(true);
-      break;
-    case 1:
-      flash_beat(false);
-      break;
-    default:
-      break;
+    byte x = Serial.read();
+    byte y = Serial.read();
+
+    // stop working if the first byte is zero
+    if (x == 0) {
+      interval_millis = 0;
+      stop_beat();
+      return;
     }
+
+    // update variables
+    previous_millis = current_millis;
+    interval_millis = (60L * 1000) / (unsigned long)x;
+    num_beats = (int)y;
+    current_beat = 0;
+
+    flash_beat(true);
+  } else if (interval_millis != 0 && current_millis - previous_millis >= interval_millis) {
+    previous_millis += interval_millis;
+    current_beat = (current_beat + 1) % num_beats;
+    flash_beat(current_beat == 0);
   }
 }
 

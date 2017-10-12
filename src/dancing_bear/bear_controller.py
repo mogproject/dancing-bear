@@ -1,4 +1,5 @@
 import serial
+import time
 
 
 class BearController(object):
@@ -6,9 +7,10 @@ class BearController(object):
         self.port = port
         self.baud_rate = baud_rate
         self.ser = serial.Serial(port, baud_rate, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE)
+        time.sleep(2)
 
-    def start(self, bpm, num_beats):
-        self.ser.write(bytearray([bpm, num_beats]))
+    def play_downbeat(self):
+        self.ser.write(bytearray([0]))
 
-    def stop(self):
-        self.ser.write(bytearray([0, 0]))
+    def play_upbeat(self):
+        self.ser.write(bytearray([1]))

@@ -29,9 +29,7 @@ class BPMRecorder:
                 time_recorded.clear()
                 count += 1
                 print(count)
-
-                if (self.midi_controller is not None):
-                    self.midi_controller.play_downbeat()
+                self._play_downbeat()
 
             elif ch == 'k':
                 # Stop recording
@@ -68,9 +66,8 @@ class BPMRecorder:
 
                 count += 1
                 print(count)
+                self._play_upbeat()
 
-                if (self.midi_controller is not None):
-                    self.midi_controller.play_upbeat()
             elif ch == 'q':
                 self._stop_play()
                 break
@@ -86,14 +83,22 @@ class BPMRecorder:
         print(message)
         print()
 
+    def _play_downbeat(self):
+        if (self.midi_controller is not None):
+            self.midi_controller.play_downbeat()
+        if (self.bear_controller is not None):
+            self.bear_controller.play_downbeat()
+
+    def _play_upbeat(self):
+        if (self.midi_controller is not None):
+            self.midi_controller.play_upbeat()
+        if (self.bear_controller is not None):
+            self.bear_controller.play_upbeat()
+
     def _start_play(self, bpm, num_beats):
         if (self.midi_controller is not None):
             self.midi_controller.start_play(bpm, num_beats)
-        if (self.bear_controller is not None):
-            self.bear_controller.start(bpm, num_beats)
 
     def _stop_play(self):
         if (self.midi_controller is not None):
             self.midi_controller.stop_play()
-        if (self.bear_controller is not None):
-            self.bear_controller.stop()
