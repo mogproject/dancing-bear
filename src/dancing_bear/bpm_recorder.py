@@ -1,4 +1,6 @@
 from datetime import datetime
+import sys
+import time
 
 
 class BPMRecorder:
@@ -9,13 +11,12 @@ class BPMRecorder:
         self.term = term
         self.midi_controller = midi_controller
         self.bear_controller = bear_controller
+        self._print_header()
 
     def loop(self):
         count = 0
         last_recorded = None
         time_recorded = []
-
-        self._print_header()
 
         while True:
             ch = self.term.getch()
@@ -52,7 +53,7 @@ class BPMRecorder:
                     self._print_message('BPM too low: %d (Min: %d). Please retry.' % (bpm, BPMRecorder.MIN_BPM))
                 else:
                     # ok
-                    self._print_message('Playing: BPM=%d, #Beats=%d' % (bpm, num_beats))
+                    self._print_message('Playing: BPM=%d, #Beats=%d\n\nPress Ctrl-C to stop.' % (bpm, num_beats))
                     self._start_play(bpm, num_beats)
                 count = 0
 
@@ -96,8 +97,18 @@ class BPMRecorder:
             self.bear_controller.play_upbeat()
 
     def _start_play(self, bpm, num_beats):
-        if (self.midi_controller is not None):
-            self.midi_controller.start_play(bpm, num_beats)
+        interval = 60 / bpm
+        i = 0
+        try:
+            while True:
+                if i == 0:
+                    self._play_downbeat()
+                else:
+                    self._play_upbeat()
+                time.sleep(interval)
+                i = (i + 1) % num_beats
+        except KeyboardInterrupt:
+            self._print_header()
 
     def _stop_play(self):
         if (self.midi_controller is not None):
