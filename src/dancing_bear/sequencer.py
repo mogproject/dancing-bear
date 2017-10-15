@@ -4,6 +4,9 @@ from datetime import timedelta
 
 
 def start_sequence(bear_controller, midi_controller, bpm, num_beats):
+    if bear_controller is not None:
+        bear_controller.send_bpm(bpm)
+
     loop = asyncio.new_event_loop()
 
     # schedule the first beat

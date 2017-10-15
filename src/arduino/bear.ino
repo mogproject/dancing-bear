@@ -8,10 +8,13 @@ const int latch = 9;  // 74HC595  pin 9 STCP
 const int clock = 10; // 74HC595  pin 10 SHCP
 const int data = 8;   // 74HC595  pin 8 DS
 
+const int SERVO_MAX_DEGREE = 30;
+
 #include <Servo.h>
 
 Servo myservo; // create servo object to control a servo
 bool servo_count = false;
+int current_bpm = 120;
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -51,7 +54,8 @@ void loop() {
       flash_beat(false);
       break;
     default:
-      display_int(x);
+      current_bpm = (unsigned char)x;
+      display_int();
       break;
     }
   }
@@ -75,11 +79,18 @@ void stop_beat() {
 }
 
 void switch_servo() {
-  myservo.write(servo_count ? 60 : 120);
+  int step = 10;
+  int sign = servo_count ? -1 : 1;
+
+  delay(max(0, 60000 / current_bpm - 300));
+  for (int i = -SERVO_MAX_DEGREE; i <= SERVO_MAX_DEGREE; i += step) {
+    delay(20);
+    myservo.write(90 + sign * i);
+  }
   servo_count = !servo_count;
 }
 
-void display_int(int x) {
+void display_int() {
   digitalWrite(latch, LOW);
   shiftOut(data, clock, MSBFIRST, 0xff);
   digitalWrite(latch, HIGH);
