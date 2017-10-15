@@ -14,3 +14,6 @@ class BearController(object):
 
     def play_upbeat(self):
         self.ser.write(bytearray([1]))
+
+    def send_bpm(self, bpm):
+        self.ser.write(bytearray([bpm]))

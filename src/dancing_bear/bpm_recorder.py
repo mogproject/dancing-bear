@@ -2,6 +2,8 @@ from datetime import datetime
 import sys
 import time
 
+from .sequencer import start_sequence
+
 
 class BPMRecorder:
     MAX_BPM = 255
@@ -85,31 +87,36 @@ class BPMRecorder:
         print()
 
     def _play_downbeat(self):
-        if (self.midi_controller is not None):
+        if self.midi_controller is not None:
             self.midi_controller.play_downbeat()
-        if (self.bear_controller is not None):
+        if self.bear_controller is not None:
             self.bear_controller.play_downbeat()
 
     def _play_upbeat(self):
-        if (self.midi_controller is not None):
+        if self.midi_controller is not None:
             self.midi_controller.play_upbeat()
-        if (self.bear_controller is not None):
+        if self.bear_controller is not None:
             self.bear_controller.play_upbeat()
 
     def _start_play(self, bpm, num_beats):
-        interval = 60 / bpm
-        i = 0
-        try:
-            while True:
-                if i == 0:
-                    self._play_downbeat()
-                else:
-                    self._play_upbeat()
-                time.sleep(interval)
-                i = (i + 1) % num_beats
-        except KeyboardInterrupt:
-            self._print_header()
+        start_sequence(self.bear_controller, self.midi_controller, bpm, num_beats)
+        self._print_header()
+
+        # interval = 60 / bpm
+        # i = 0
+        # try:
+        #     if self.bear_controller:
+        #         self.bear_controller.send_bpm(bpm)
+
+        #     while True:
+        #         if i == 0:
+        #             self._play_downbeat()
+        #         else:
+        #             self._play_upbeat()
+        #         time.sleep(interval)
+        #         i = (i + 1) % num_beats
+        # except KeyboardInterrupt:
+        #     self._print_header()
 
     def _stop_play(self):
-        if (self.midi_controller is not None):
-            self.midi_controller.stop_play()
+        pass
