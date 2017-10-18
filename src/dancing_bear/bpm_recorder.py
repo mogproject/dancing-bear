@@ -102,21 +102,5 @@ class BPMRecorder:
         start_sequence(self.bear_controller, self.midi_controller, bpm, num_beats)
         self._print_header()
 
-        # interval = 60 / bpm
-        # i = 0
-        # try:
-        #     if self.bear_controller:
-        #         self.bear_controller.send_bpm(bpm)
-
-        #     while True:
-        #         if i == 0:
-        #             self._play_downbeat()
-        #         else:
-        #             self._play_upbeat()
-        #         time.sleep(interval)
-        #         i = (i + 1) % num_beats
-        # except KeyboardInterrupt:
-        #     self._print_header()
-
     def _stop_play(self):
         pass
