@@ -112,11 +112,11 @@ void switch_servo() {
   int delay_ms = interval * 4 / 5 / (num_steps * 2);
 
   for (int i = 0; i < num_steps; ++i) {
-    myservo.write(90 - i * step);
+    myservo.write(90 + i * step);
     delay(delay_ms);
   }
   for (int i = num_steps; i > 0; --i) {
-    myservo.write(90 - i * step);
+    myservo.write(90 + i * step);
     delay(delay_ms);
   }
   myservo.write(90);
