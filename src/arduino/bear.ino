@@ -1,20 +1,28 @@
+#include <Servo.h>
+#include "IRremote.h"
+
 // define pins
+
+const int IR_RECEIVER = 11;
+
 const int SERVO = 2;
+
 const int BLUE = 3;
 const int GREEN = 5;
 const int RED = 6;
 
-const int latch = 9;  // 74HC595  pin 9 STCP
-const int clock = 10; // 74HC595  pin 10 SHCP
-const int data = 8;   // 74HC595  pin 8 DS
+const int LED_1 = 9;
+const int LED_2 = 8;
 
 const int SERVO_MAX_DEGREE = 30;
 
-#include <Servo.h>
 
 Servo myservo; // create servo object to control a servo
 bool servo_count = false;
 int current_bpm = 120;
+
+IRrecv irrecv(IR_RECEIVER);     // create instance of 'irrecv'
+decode_results results;      // create instance of 'decode_results'
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -25,19 +33,21 @@ void setup() {
   pinMode(RED, OUTPUT);
   pinMode(GREEN, OUTPUT);
   pinMode(BLUE, OUTPUT);
+  pinMode(LED_1, OUTPUT);
+  pinMode(LED_2, OUTPUT);
 
   digitalWrite(LED_BUILTIN, LOW);
   digitalWrite(RED, LOW);
   digitalWrite(GREEN, LOW);
   digitalWrite(BLUE, LOW);
+  digitalWrite(LED_1, LOW);
+  digitalWrite(LED_2, LOW);
 
   // attaches the servo on pin 9 to the servo object
   myservo.attach(SERVO);
 
-  // 4-digit display
-  pinMode(latch, OUTPUT);
-  pinMode(clock, OUTPUT);
-  pinMode(data, OUTPUT);
+  // IR receiver
+  irrecv.enableIRIn(); 
 }
 
 // the loop function runs over and over again forever
@@ -47,26 +57,28 @@ void loop() {
     // read serial input
     char x = Serial.read();
     switch (x) {
-    case 0:
-      flash_beat(true);
-      break;
-    case 1:
-      flash_beat(false);
-      break;
-    default:
-      current_bpm = (unsigned char)x;
-      display_int();
-      break;
+      case 0: flash_beat(true); break;
+      case 1: flash_beat(false); break;
+      default: if (x > 1) current_bpm = x; break;
     }
+  } else if (irrecv.decode(&results)) {
+    switch (translate_ir()) {
+      case 1: flash_beat(true); break;
+      case 2: flash_beat(false); break;
+      default: break;
+    } 
+    irrecv.resume();
   }
 }
 
 void flash_beat(bool is_downbeat) {
   digitalWrite(LED_BUILTIN, HIGH);
   digitalWrite(is_downbeat ? RED : BLUE, HIGH);
+  digitalWrite(is_downbeat ? LED_1 : LED_2, HIGH);
   delay(is_downbeat ? 200 : 150);
   digitalWrite(LED_BUILTIN, LOW);
   digitalWrite(is_downbeat ? RED : BLUE, LOW);
+  digitalWrite(is_downbeat ? LED_1 : LED_2, LOW);
   switch_servo();
 }
 
@@ -75,6 +87,8 @@ void stop_beat() {
   digitalWrite(RED, LOW);
   digitalWrite(GREEN, LOW);
   digitalWrite(BLUE, LOW);
+  digitalWrite(LED_1, LOW);
+  digitalWrite(LED_2, LOW);
   switch_servo();
 }
 
@@ -90,8 +104,31 @@ void switch_servo() {
   servo_count = !servo_count;
 }
 
-void display_int() {
-  digitalWrite(latch, LOW);
-  shiftOut(data, clock, MSBFIRST, 0xff);
-  digitalWrite(latch, HIGH);
+int translate_ir() {
+  // todo control repetition
+  switch(results.value) {
+    case 0xFFA25D: return 64; // POWER
+    case 0xFFE21D: return 65; // FUNC/STOP
+    case 0xFF629D: return 66; // VOL+
+    case 0xFF22DD: return 67; // FAST BACK
+    case 0xFF02FD: return 68; // PAUSE
+    case 0xFFC23D: return 69; // FAST FORWAR
+    case 0xFFE01F: return 70; // DOWN
+    case 0xFFA857: return 71; // VOL-
+    case 0xFF906F: return 72; // UP
+    case 0xFF9867: return 73; // EQ
+    case 0xFFB04F: return 74; // ST/REPT
+    case 0xFF6897: return 0; // 0
+    case 0xFF30CF: return 1; // 1
+    case 0xFF18E7: return 2; // 2
+    case 0xFF7A85: return 3; // 3
+    case 0xFF10EF: return 4; // 4
+    case 0xFF38C7: return 5; // 5
+    case 0xFF5AA5: return 6; // 6
+    case 0xFF42BD: return 7; // 7
+    case 0xFF4AB5: return 8; // 8
+    case 0xFF52AD: return 9; // 9
+    case 0xFFFFFFFF: return 75; // REPEAT
+    default: return -1; // other button
+  }
 }
