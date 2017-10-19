@@ -14,12 +14,12 @@ const int RED = 6;
 const int LED_1 = 9;
 const int LED_2 = 8;
 
-const int SERVO_MAX_ANGLE = 45;
+const int SERVO_MAX_ANGLE = 30;
 
 const int BLINK_INTERVAL = 150; // in milliseconds
 
 Servo myservo; // create servo object to control a servo
-bool servo_count = false;
+
 int current_bpm = 120;
 unsigned long previous_blink_downbeat = 0;
 unsigned long previous_blink_upbeat = 0;
@@ -105,17 +105,21 @@ void stop_blink(bool is_downbeat, unsigned long current_millis) {
 }
 
 void switch_servo() {
-  int step = 5;
-  int sign = servo_count ? -1 : 1;
-  int interval = 60000 / current_bpm;
-  int delay_ms = interval * 4 / 5 / SERVO_MAX_ANGLE * 2 / step;
+  int num_steps = 4;
+  int step = SERVO_MAX_ANGLE / num_steps;
 
-  //delay(max(0, interval - 300));
-  for (int i = -SERVO_MAX_ANGLE; i <= SERVO_MAX_ANGLE; i += step) {
-    myservo.write(90 + sign * i);
-    if (i != SERVO_MAX_ANGLE) delay(delay_ms);
+  int interval = 60000 / current_bpm;
+  int delay_ms = interval * 4 / 5 / (num_steps * 2);
+
+  for (int i = 0; i < num_steps; ++i) {
+    myservo.write(90 - i * step);
+    delay(delay_ms);
   }
-  servo_count = !servo_count;
+  for (int i = num_steps; i > 0; --i) {
+    myservo.write(90 - i * step);
+    delay(delay_ms);
+  }
+  myservo.write(90);
 }
 
 int translate_ir() {
