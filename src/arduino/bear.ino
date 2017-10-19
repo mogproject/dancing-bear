@@ -14,7 +14,7 @@ const int RED = 6;
 const int LED_1 = 9;
 const int LED_2 = 8;
 
-const int SERVO_MAX_DEGREE = 30;
+const int SERVO_MAX_ANGLE = 45;
 
 
 Servo myservo; // create servo object to control a servo
@@ -65,6 +65,7 @@ void loop() {
     switch (translate_ir()) {
       case 1: flash_beat(true); break;
       case 2: flash_beat(false); break;
+//      case 7: test_speed(75); break;
       default: break;
     } 
     irrecv.resume();
@@ -75,7 +76,7 @@ void flash_beat(bool is_downbeat) {
   digitalWrite(LED_BUILTIN, HIGH);
   digitalWrite(is_downbeat ? RED : BLUE, HIGH);
   digitalWrite(is_downbeat ? LED_1 : LED_2, HIGH);
-  delay(is_downbeat ? 200 : 150);
+  delay(150);
   digitalWrite(LED_BUILTIN, LOW);
   digitalWrite(is_downbeat ? RED : BLUE, LOW);
   digitalWrite(is_downbeat ? LED_1 : LED_2, LOW);
@@ -93,13 +94,15 @@ void stop_beat() {
 }
 
 void switch_servo() {
-  int step = 10;
+  int step = 5;
   int sign = servo_count ? -1 : 1;
+  int interval = 60000 / current_bpm;
+  int delay_ms = interval * 4 / 5 / SERVO_MAX_ANGLE * 2 / step;
 
-  delay(max(0, 60000 / current_bpm - 300));
-  for (int i = -SERVO_MAX_DEGREE; i <= SERVO_MAX_DEGREE; i += step) {
-    delay(20);
+  //delay(max(0, interval - 300));
+  for (int i = -SERVO_MAX_ANGLE; i <= SERVO_MAX_ANGLE; i += step) {
     myservo.write(90 + sign * i);
+    if (i != SERVO_MAX_ANGLE) delay(delay_ms);
   }
   servo_count = !servo_count;
 }
@@ -130,5 +133,14 @@ int translate_ir() {
     case 0xFF52AD: return 9; // 9
     case 0xFFFFFFFF: return 75; // REPEAT
     default: return -1; // other button
+  }
+}
+
+void test_speed(int angle) {
+  for (int i = 0; i < 20; ++i) {
+    myservo.write(90 - angle);
+    delay(300);
+    myservo.write(90 + angle);
+    delay(300);
   }
 }
