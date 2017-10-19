@@ -74,10 +74,10 @@ void loop() {
       default: break;
     } 
     irrecv.resume();
-  } else {
-    if (previous_blink_downbeat && current_millis - previous_blink_downbeat >= BLINK_INTERVAL) stop_blink(true, current_millis);
-    if (previous_blink_upbeat && current_millis - previous_blink_upbeat >= BLINK_INTERVAL) stop_blink(false, current_millis);
   }
+
+  if (previous_blink_downbeat && current_millis - previous_blink_downbeat >= BLINK_INTERVAL) stop_blink(true);
+  if (previous_blink_upbeat && current_millis - previous_blink_upbeat >= BLINK_INTERVAL) stop_blink(false);
 }
 
 void flash_beat(bool is_downbeat, unsigned long current_millis) {
@@ -97,29 +97,30 @@ void stop_beat() {
   digitalWrite(LED_2, LOW);
 }
 
-void stop_blink(bool is_downbeat, unsigned long current_millis) {
+void stop_blink(bool is_downbeat) {
   digitalWrite(LED_BUILTIN, LOW);
   digitalWrite(is_downbeat ? RED : BLUE, LOW);
   digitalWrite(is_downbeat ? LED_1 : LED_2, LOW);
-  (is_downbeat ? previous_blink_downbeat : previous_blink_upbeat) = current_millis;
+  (is_downbeat ? previous_blink_downbeat : previous_blink_upbeat) = 0;
 }
 
 void switch_servo() {
   int num_steps = 4;
+  int base_angle = 90;
   int step = SERVO_MAX_ANGLE / num_steps;
 
   int interval = 60000 / current_bpm;
   int delay_ms = interval * 4 / 5 / (num_steps * 2);
 
   for (int i = 0; i < num_steps; ++i) {
-    myservo.write(90 + i * step);
+    myservo.write(base_angle + i * step);
     delay(delay_ms);
   }
   for (int i = num_steps; i > 0; --i) {
-    myservo.write(90 + i * step);
+    myservo.write(base_angle + i * step);
     delay(delay_ms);
   }
-  myservo.write(90);
+  myservo.write(base_angle);
 }
 
 int translate_ir() {
