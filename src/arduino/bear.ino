@@ -15,14 +15,21 @@ const int LED_1 = 9;
 const int LED_2 = 8;
 
 const int SERVO_MAX_ANGLE = 30;
+const int SERVO_BASE_ANGLE = 60;
 
 const int BLINK_INTERVAL = 150; // in milliseconds
+const int DEGREE_STEP = 1;
+const int SERVO_INTERVAL = 10; // in milliseconds
 
 Servo myservo; // create servo object to control a servo
 
 int current_bpm = 120;
+int current_angle = 0;
+
+bool current_velocity_positive = true;
 unsigned long previous_blink_downbeat = 0;
 unsigned long previous_blink_upbeat = 0;
+unsigned long previous_servo_move = 0;
 
 IRrecv irrecv(IR_RECEIVER);     // create instance of 'irrecv'
 decode_results results;      // create instance of 'decode_results'
@@ -78,13 +85,29 @@ void loop() {
 
   if (previous_blink_downbeat && current_millis - previous_blink_downbeat >= BLINK_INTERVAL) stop_blink(true);
   if (previous_blink_upbeat && current_millis - previous_blink_upbeat >= BLINK_INTERVAL) stop_blink(false);
+
+  if (previous_servo_move && current_millis - previous_servo_move >= SERVO_INTERVAL) {
+    // check if it should return
+    if (current_angle >= 60000 / current_bpm * 4 / 5 / (2 * SERVO_INTERVAL / DEGREE_STEP)) {
+      --current_angle;
+      current_velocity_positive = !current_velocity_positive;
+    }
+    // move the servo
+    current_angle += (current_velocity_positive ? 1 : -1) * DEGREE_STEP;
+    myservo.write(SERVO_BASE_ANGLE + current_angle);
+    if (current_angle == 0 && !current_velocity_positive) {
+      previous_servo_move = 0;
+    } else {
+      previous_servo_move += SERVO_INTERVAL;
+    }
+  }
 }
 
 void flash_beat(bool is_downbeat, unsigned long current_millis) {
   digitalWrite(LED_BUILTIN, HIGH);
   digitalWrite(is_downbeat ? RED : BLUE, HIGH);
   digitalWrite(is_downbeat ? LED_1 : LED_2, HIGH);
-  switch_servo();
+  start_servo(current_millis);
   (is_downbeat ? previous_blink_downbeat : previous_blink_upbeat) = current_millis;
 }
 
@@ -102,6 +125,13 @@ void stop_blink(bool is_downbeat) {
   digitalWrite(is_downbeat ? RED : BLUE, LOW);
   digitalWrite(is_downbeat ? LED_1 : LED_2, LOW);
   (is_downbeat ? previous_blink_downbeat : previous_blink_upbeat) = 0;
+}
+
+void start_servo(unsigned long current_millis) {
+  myservo.write(SERVO_BASE_ANGLE);
+  current_angle = 0;
+  current_velocity_positive = true;
+  previous_servo_move = current_millis;
 }
 
 void switch_servo() {
