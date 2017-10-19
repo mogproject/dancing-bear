@@ -16,10 +16,13 @@ const int LED_2 = 8;
 
 const int SERVO_MAX_ANGLE = 45;
 
+const int BLINK_INTERVAL = 150; // in milliseconds
 
 Servo myservo; // create servo object to control a servo
 bool servo_count = false;
 int current_bpm = 120;
+unsigned long previous_blink_downbeat = 0;
+unsigned long previous_blink_upbeat = 0;
 
 IRrecv irrecv(IR_RECEIVER);     // create instance of 'irrecv'
 decode_results results;      // create instance of 'decode_results'
@@ -52,35 +55,37 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
+  unsigned long current_millis = millis();
+
   // catch signal
   if (Serial.available()) {
     // read serial input
     char x = Serial.read();
     switch (x) {
-      case 0: flash_beat(true); break;
-      case 1: flash_beat(false); break;
+      case 0: flash_beat(true, current_millis); break;
+      case 1: flash_beat(false, current_millis); break;
       default: if (x > 1) current_bpm = x; break;
     }
   } else if (irrecv.decode(&results)) {
     switch (translate_ir()) {
-      case 1: flash_beat(true); break;
-      case 2: flash_beat(false); break;
+      case 1: flash_beat(true, current_millis); break;
+      case 2: flash_beat(false, current_millis); break;
 //      case 7: test_speed(75); break;
       default: break;
     } 
     irrecv.resume();
+  } else {
+    if (previous_blink_downbeat && current_millis - previous_blink_downbeat >= BLINK_INTERVAL) stop_blink(true, current_millis);
+    if (previous_blink_upbeat && current_millis - previous_blink_upbeat >= BLINK_INTERVAL) stop_blink(false, current_millis);
   }
 }
 
-void flash_beat(bool is_downbeat) {
+void flash_beat(bool is_downbeat, unsigned long current_millis) {
   digitalWrite(LED_BUILTIN, HIGH);
   digitalWrite(is_downbeat ? RED : BLUE, HIGH);
   digitalWrite(is_downbeat ? LED_1 : LED_2, HIGH);
-  delay(150);
-  digitalWrite(LED_BUILTIN, LOW);
-  digitalWrite(is_downbeat ? RED : BLUE, LOW);
-  digitalWrite(is_downbeat ? LED_1 : LED_2, LOW);
   switch_servo();
+  (is_downbeat ? previous_blink_downbeat : previous_blink_upbeat) = current_millis;
 }
 
 void stop_beat() {
@@ -90,7 +95,13 @@ void stop_beat() {
   digitalWrite(BLUE, LOW);
   digitalWrite(LED_1, LOW);
   digitalWrite(LED_2, LOW);
-  switch_servo();
+}
+
+void stop_blink(bool is_downbeat, unsigned long current_millis) {
+  digitalWrite(LED_BUILTIN, LOW);
+  digitalWrite(is_downbeat ? RED : BLUE, LOW);
+  digitalWrite(is_downbeat ? LED_1 : LED_2, LOW);
+  (is_downbeat ? previous_blink_downbeat : previous_blink_upbeat) = current_millis;
 }
 
 void switch_servo() {
