@@ -82,24 +82,10 @@ void loop() {
       default: break;
     } 
     irrecv.resume();
-  }
-
-  if (previous_blink_downbeat && current_millis - previous_blink_downbeat >= BLINK_INTERVAL) stop_blink(true);
-  if (previous_blink_upbeat && current_millis - previous_blink_upbeat >= BLINK_INTERVAL) stop_blink(false);
-
-  if (previous_servo_move && current_millis - previous_servo_move >= SERVO_INTERVAL) {
-    // check if it should return
-    if (current_angle >= current_max_angle) current_velocity_positive = false;
-
-    // move the servo
-    current_angle += (current_velocity_positive ? 1 : -1) * DEGREE_STEP;
-    myservo.write(SERVO_BASE_ANGLE + current_angle);
-
-    if (current_angle == 0 && !current_velocity_positive) {
-      previous_servo_move = 0; // finish moving
-    } else {
-      previous_servo_move += SERVO_INTERVAL;
-    }
+  } else {
+    if (previous_blink_downbeat && current_millis - previous_blink_downbeat >= BLINK_INTERVAL) stop_blink(true);
+    if (previous_blink_upbeat && current_millis - previous_blink_upbeat >= BLINK_INTERVAL) stop_blink(false);
+    if (previous_servo_move && current_millis - previous_servo_move >= SERVO_INTERVAL) move_servo();
   }
 }
 
@@ -137,6 +123,21 @@ void start_servo(unsigned long current_millis) {
   current_max_angle = min(SERVO_MAX_ANGLE, get_max_angle());
   current_velocity_positive = true;
   previous_servo_move = current_millis;
+}
+
+void move_servo() {
+  // check if it should return
+  if (current_angle >= current_max_angle) current_velocity_positive = false;
+
+  // move the servo
+  current_angle += (current_velocity_positive ? 1 : -1) * DEGREE_STEP;
+  myservo.write(SERVO_BASE_ANGLE + current_angle);
+
+  if (current_angle == 0 && !current_velocity_positive) {
+    previous_servo_move = 0; // finish moving
+  } else {
+    previous_servo_move += SERVO_INTERVAL;
+  }
 }
 
 int translate_ir() {
