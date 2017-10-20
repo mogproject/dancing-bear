@@ -28,16 +28,3 @@ class MidiController:
 
     def play_upbeat(self):
         execute_command(self.upbeat_args)
-
-    def start_play(self, bpm, num_beats):
-        args = ['./play_midi.sh', str(bpm), str(num_beats)]
-        proc = subprocess.Popen(args, stdout=subprocess.PIPE, shell=False, preexec_fn=os.setsid)
-        self.midi_pid = proc.pid
-
-    def stop_play(self):
-        if (self.midi_pid is not None):
-            try:
-                os.killpg(os.getpgid(self.midi_pid), signal.SIGTERM)
-            except Exception:
-                pass
-            self.midi_pid = None
