@@ -7,25 +7,27 @@ const int IR_RECEIVER = 11;
 
 const int SERVO = 2;
 
-const int BLUE = 3;
-const int GREEN = 5;
-const int RED = 6;
+// const int BLUE = 3;
+// const int GREEN = 5;
+// const int RED = 6;
 
 const int LED_1 = 9;
 const int LED_2 = 8;
 
-const int SERVO_MAX_ANGLE = 30;
 const int SERVO_BASE_ANGLE = 60;
+const int SERVO_MAX_ANGLE = 60;
 
 const int BLINK_INTERVAL = 150; // in milliseconds
 const int DEGREE_STEP = 1;
-const int SERVO_INTERVAL = 10; // in milliseconds
+const int SERVO_INTERVAL = 8; // in milliseconds
 
 Servo myservo; // create servo object to control a servo
 
 int current_bpm = 120;
 int current_angle = 0;
+int current_max_angle = 60;
 
+// time variables
 bool current_velocity_positive = true;
 unsigned long previous_blink_downbeat = 0;
 unsigned long previous_blink_upbeat = 0;
@@ -39,17 +41,17 @@ void setup() {
   Serial.begin(9600);
 
   // initialize digital pin LED_BUILTIN as an output.
-  pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(RED, OUTPUT);
-  pinMode(GREEN, OUTPUT);
-  pinMode(BLUE, OUTPUT);
+  // pinMode(LED_BUILTIN, OUTPUT);
+  // pinMode(RED, OUTPUT);
+  // pinMode(GREEN, OUTPUT);
+  // pinMode(BLUE, OUTPUT);
   pinMode(LED_1, OUTPUT);
   pinMode(LED_2, OUTPUT);
 
-  digitalWrite(LED_BUILTIN, LOW);
-  digitalWrite(RED, LOW);
-  digitalWrite(GREEN, LOW);
-  digitalWrite(BLUE, LOW);
+  // digitalWrite(LED_BUILTIN, LOW);
+  // digitalWrite(RED, LOW);
+  // digitalWrite(GREEN, LOW);
+  // digitalWrite(BLUE, LOW);
   digitalWrite(LED_1, LOW);
   digitalWrite(LED_2, LOW);
 
@@ -77,7 +79,6 @@ void loop() {
     switch (translate_ir()) {
       case 1: flash_beat(true, current_millis); break;
       case 2: flash_beat(false, current_millis); break;
-//      case 7: test_speed(75); break;
       default: break;
     } 
     irrecv.resume();
@@ -88,41 +89,44 @@ void loop() {
 
   if (previous_servo_move && current_millis - previous_servo_move >= SERVO_INTERVAL) {
     // check if it should return
-    if (current_angle >= 60000 / current_bpm * 4 / 5 / (2 * SERVO_INTERVAL / DEGREE_STEP)) {
-      --current_angle;
-      current_velocity_positive = !current_velocity_positive;
-    }
+    if (current_angle >= current_max_angle) current_velocity_positive = false;
+
     // move the servo
     current_angle += (current_velocity_positive ? 1 : -1) * DEGREE_STEP;
     myservo.write(SERVO_BASE_ANGLE + current_angle);
+
     if (current_angle == 0 && !current_velocity_positive) {
-      previous_servo_move = 0;
+      previous_servo_move = 0; // finish moving
     } else {
       previous_servo_move += SERVO_INTERVAL;
     }
   }
 }
 
+int get_max_angle() {
+  return 60000 / current_bpm / (2 * SERVO_INTERVAL / DEGREE_STEP);
+}
+
 void flash_beat(bool is_downbeat, unsigned long current_millis) {
-  digitalWrite(LED_BUILTIN, HIGH);
-  digitalWrite(is_downbeat ? RED : BLUE, HIGH);
+  // digitalWrite(LED_BUILTIN, HIGH);
+  // digitalWrite(is_downbeat ? RED : BLUE, HIGH);
   digitalWrite(is_downbeat ? LED_1 : LED_2, HIGH);
   start_servo(current_millis);
   (is_downbeat ? previous_blink_downbeat : previous_blink_upbeat) = current_millis;
 }
 
 void stop_beat() {
-  digitalWrite(LED_BUILTIN, LOW);
-  digitalWrite(RED, LOW);
-  digitalWrite(GREEN, LOW);
-  digitalWrite(BLUE, LOW);
+  // digitalWrite(LED_BUILTIN, LOW);
+  // digitalWrite(RED, LOW);
+  // digitalWrite(GREEN, LOW);
+  // digitalWrite(BLUE, LOW);
   digitalWrite(LED_1, LOW);
   digitalWrite(LED_2, LOW);
 }
 
 void stop_blink(bool is_downbeat) {
-  digitalWrite(LED_BUILTIN, LOW);
-  digitalWrite(is_downbeat ? RED : BLUE, LOW);
+  // digitalWrite(LED_BUILTIN, LOW);
+  // digitalWrite(is_downbeat ? RED : BLUE, LOW);
   digitalWrite(is_downbeat ? LED_1 : LED_2, LOW);
   (is_downbeat ? previous_blink_downbeat : previous_blink_upbeat) = 0;
 }
@@ -130,27 +134,9 @@ void stop_blink(bool is_downbeat) {
 void start_servo(unsigned long current_millis) {
   myservo.write(SERVO_BASE_ANGLE);
   current_angle = 0;
+  current_max_angle = min(SERVO_MAX_ANGLE, get_max_angle());
   current_velocity_positive = true;
   previous_servo_move = current_millis;
-}
-
-void switch_servo() {
-  int num_steps = 4;
-  int base_angle = 90;
-  int step = SERVO_MAX_ANGLE / num_steps;
-
-  int interval = 60000 / current_bpm;
-  int delay_ms = interval * 4 / 5 / (num_steps * 2);
-
-  for (int i = 0; i < num_steps; ++i) {
-    myservo.write(base_angle + i * step);
-    delay(delay_ms);
-  }
-  for (int i = num_steps; i > 0; --i) {
-    myservo.write(base_angle + i * step);
-    delay(delay_ms);
-  }
-  myservo.write(base_angle);
 }
 
 int translate_ir() {
@@ -179,14 +165,5 @@ int translate_ir() {
     case 0xFF52AD: return 9; // 9
     case 0xFFFFFFFF: return 75; // REPEAT
     default: return -1; // other button
-  }
-}
-
-void test_speed(int angle) {
-  for (int i = 0; i < 20; ++i) {
-    myservo.write(90 - angle);
-    delay(300);
-    myservo.write(90 + angle);
-    delay(300);
   }
 }
