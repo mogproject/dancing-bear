@@ -18,8 +18,10 @@ const int SERVO_BASE_ANGLE = 60;
 const int SERVO_MAX_ANGLE = 60;
 
 const int BLINK_INTERVAL = 150; // in milliseconds
-const int DEGREE_STEP = 1;
-const int SERVO_INTERVAL = 8; // in milliseconds
+const int DEGREE_STEP_FORWARD = 2;
+const int DEGREE_STEP_BACKWARD = 1;
+const int SERVO_INTERVAL_FORWARD = 8; // in milliseconds : omega_1 = DEGREE_STEP_FORWARD/SERVO_INTERVAL_FORWARD
+const int SERVO_INTERVAL_BACKWARD = 8; // in milliseconds : /omega_2 = DEGREE_STEP_BACKWARD/SERVO_INTERVAL_BACKWARD
 
 Servo myservo; // create servo object to control a servo
 
@@ -85,12 +87,27 @@ void loop() {
   } else {
     if (previous_blink_downbeat && current_millis - previous_blink_downbeat >= BLINK_INTERVAL) stop_blink(true);
     if (previous_blink_upbeat && current_millis - previous_blink_upbeat >= BLINK_INTERVAL) stop_blink(false);
-    if (previous_servo_move && current_millis - previous_servo_move >= SERVO_INTERVAL) move_servo();
+    if (previous_servo_move && current_millis - previous_servo_move >= get_servo_interval()) move_servo();
   }
 }
 
+int get_servo_interval() {
+  return current_velocity_positive ? SERVO_INTERVAL_FORWARD : SERVO_INTERVAL_BACKWARD;
+}
+
+/** t := 60 s / BPM */
+int get_ms_per_beat() {
+  return 60000 / current_bpm;
+}
+
+/** t' := 0.7t */
+int get_servo_effective_time() {
+  return get_ms_per_beat() * 7 / 10;
+}
+
+/** theta_max := t' / (1/omega_1 + 1/omega_2) */
 int get_max_angle() {
-  return 60000 / current_bpm / (2 * SERVO_INTERVAL / DEGREE_STEP);
+  return get_servo_effective_time() / (SERVO_INTERVAL_FORWARD * DEGREE_STEP_FORWARD + SERVO_INTERVAL_BACKWARD * DEGREE_STEP_BACKWARD);
 }
 
 void flash_beat(bool is_downbeat, unsigned long current_millis) {
@@ -130,13 +147,13 @@ void move_servo() {
   if (current_angle >= current_max_angle) current_velocity_positive = false;
 
   // move the servo
-  current_angle += (current_velocity_positive ? 1 : -1) * DEGREE_STEP;
+  current_angle += (current_velocity_positive ? DEGREE_STEP_FORWARD : -DEGREE_STEP_BACKWARD);
   myservo.write(SERVO_BASE_ANGLE + current_angle);
 
   if (current_angle == 0 && !current_velocity_positive) {
     previous_servo_move = 0; // finish moving
   } else {
-    previous_servo_move += SERVO_INTERVAL;
+    previous_servo_move += get_servo_interval();
   }
 }
 
