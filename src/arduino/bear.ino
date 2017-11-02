@@ -20,8 +20,8 @@ const int SERVO_MAX_ANGLE = 60;
 const int BLINK_INTERVAL = 150; // in milliseconds
 const int DEGREE_STEP_FORWARD = 2;
 const int DEGREE_STEP_BACKWARD = 1;
-const int SERVO_INTERVAL_FORWARD = 8; // in milliseconds : omega_1 = DEGREE_STEP_FORWARD/SERVO_INTERVAL_FORWARD
-const int SERVO_INTERVAL_BACKWARD = 8; // in milliseconds : /omega_2 = DEGREE_STEP_BACKWARD/SERVO_INTERVAL_BACKWARD
+const int SERVO_INTERVAL_FORWARD = 5; // in milliseconds : omega_1 = DEGREE_STEP_FORWARD/SERVO_INTERVAL_FORWARD
+const int SERVO_INTERVAL_BACKWARD = 5; // in milliseconds : /omega_2 = DEGREE_STEP_BACKWARD/SERVO_INTERVAL_BACKWARD
 
 Servo myservo; // create servo object to control a servo
 
