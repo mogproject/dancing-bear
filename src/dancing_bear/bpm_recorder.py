@@ -1,6 +1,7 @@
 from datetime import datetime
 import sys
 import time
+from multiprocessing import Process
 
 from .sequencer import start_sequence
 
@@ -13,6 +14,7 @@ class BPMRecorder:
         self.term = term
         self.midi_controller = midi_controller
         self.bear_controller = bear_controller
+        self.current_proc = None
         self._print_header()
 
     def loop(self):
@@ -55,8 +57,9 @@ class BPMRecorder:
                     self._print_message('BPM too low: %d (Min: %d). Please retry.' % (bpm, BPMRecorder.MIN_BPM))
                 else:
                     # ok
-                    self._print_message('Playing: BPM=%d, #Beats=%d\n\nPress Ctrl-C to stop.' % (bpm, num_beats))
-                    self._start_play(bpm, num_beats)
+                    self._print_message('Playing: BPM=%d, #Beats=%d\n' % (bpm, num_beats))
+                    self.current_proc = Process(target=BPMRecorder._start_play, args=[self, bpm, num_beats])
+                    self.current_proc.start()
                 count = 0
 
             elif ch == 'j' and count == 0:
@@ -100,7 +103,8 @@ class BPMRecorder:
 
     def _start_play(self, bpm, num_beats):
         start_sequence(self.bear_controller, self.midi_controller, bpm, num_beats)
-        self._print_header()
 
     def _stop_play(self):
-        pass
+        if self.current_proc is not None:
+            self.current_proc.terminate()
+            self.current_proc = None

@@ -1,13 +1,15 @@
 import asyncio
 import concurrent
 from datetime import timedelta
-
+import signal
+import sys
 
 def start_sequence(bear_controller, midi_controller, bpm, num_beats):
     if bear_controller is not None:
         bear_controller.send_bpm(bpm)
 
     loop = asyncio.new_event_loop()
+    loop.add_signal_handler(signal.SIGTERM, lambda: loop.stop())
 
     # schedule the first beat
     loop.call_soon(play_beat, loop, bear_controller, midi_controller, loop.time(), bpm, num_beats, 0)
