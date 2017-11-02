@@ -9,6 +9,8 @@ def start_sequence(bear_controller, midi_controller, bpm, num_beats):
         bear_controller.send_bpm(bpm)
 
     loop = asyncio.new_event_loop()
+
+    # add sigterm handler
     loop.add_signal_handler(signal.SIGTERM, lambda: loop.stop())
 
     # schedule the first beat
