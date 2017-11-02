@@ -9,20 +9,25 @@ from .sequencer import start_sequence
 class BPMRecorder:
     MAX_BPM = 255
     MIN_BPM = 40
+    DEFAULT_BPM = 120
+    DEFAULT_NUM_BEATS = 4
 
-    def __init__(self, term, midi_controller=None, bear_controller=None):
+    def __init__(self, term, midi_controller=None, bear_controller=None, initial_bpm=None, initial_num_beats=None):
         self.term = term
         self.midi_controller = midi_controller
         self.bear_controller = bear_controller
         self.current_proc = None
-        self.current_bpm = 120
-        self.current_num_beats = 4
+        self.current_bpm = self.DEFAULT_BPM if initial_bpm is None else max(min(initial_bpm, self.MAX_BPM), self.MIN_BPM)
+        self.current_num_beats = self.DEFAULT_NUM_BEATS if initial_num_beats is None else max(initial_num_beats, 1)
         self._print_header()
 
-    def loop(self):
+    def loop(self, start_now=False):
         count = 0
         last_recorded = None
         time_recorded = []
+
+        if start_now:
+            self._start_play(self.current_bpm, self.current_num_beats)
 
         while True:
             ch = self.term.getch()
@@ -59,7 +64,6 @@ class BPMRecorder:
                     self._print_message('BPM too low: %d (Min: %d). Please retry.' % (bpm, BPMRecorder.MIN_BPM))
                 else:
                     # ok
-                    self._print_message('Playing: BPM=%d, #Beats=%d\n' % (bpm, num_beats))
                     self._start_play(bpm, num_beats)
                 count = 0
 
@@ -118,6 +122,7 @@ class BPMRecorder:
         self.current_bpm = bpm
         self.current_num_beats = num_beats
         self.current_proc.start()
+        self._print_message('Playing: BPM=%d, #Beats=%d\n' % (bpm, num_beats))
 
     def _stop_play(self):
         if self.current_proc:
