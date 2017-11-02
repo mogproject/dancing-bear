@@ -10,7 +10,7 @@ def main():
     """
     Main function
     """
-    t = TerminalHandler(getch_repeat_threshold=0.05)
+    t = TerminalHandler(getch_repeat_threshold=0.05, keep_input_clean=False)
     signal.signal(signal.SIGTERM, t.restore_terminal)
     try:
         mc = None

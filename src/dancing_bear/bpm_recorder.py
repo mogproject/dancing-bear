@@ -16,7 +16,7 @@ class BPMRecorder:
         self.bear_controller = bear_controller
         self.current_proc = None
         self.current_bpm = 120
-        self.current_num_beats = 0
+        self.current_num_beats = 4
         self._print_header()
 
     def loop(self):
@@ -75,18 +75,26 @@ class BPMRecorder:
                 print(count)
                 self._play_upbeat()
 
-            elif ch == 's':
+            elif ch == '\r':
                 self._restart_play()
 
             elif ch == 'q':
                 self._stop_play()
                 break
 
+            elif ch == '\x1b':
+                # arrows
+                ch2 = self.term.getch()  # expected to be '['
+                ch3 = self.term.getch()
+                d = {'A': 1, 'B': -1, 'C': 10, 'D': -10}.get(ch3, 0)
+                self.current_bpm = max(min(self.current_bpm + d, self.MAX_BPM), self.MIN_BPM)
+                self._print_message('New BPM=%d' % self.current_bpm)
+
             last_recorded = current_time
 
     def _print_header(self):
         self.term.clear()
-        print('[Q] Quit   [K] Start/stop recording   [J] Record upbeat  [S] Sync/Start\n')
+        print('[Q] Quit   [K] Start/stop recording   [J] Record upbeat  [Enter] Sync/Start\n')
 
     def _print_message(self, message):
         self._print_header()
@@ -117,6 +125,5 @@ class BPMRecorder:
             self.current_proc = None
 
     def _restart_play(self):
-        if self.current_proc:
-            self._stop_play()
-            self._start_play(self.current_bpm, self.current_num_beats)
+        self._stop_play()
+        self._start_play(self.current_bpm, self.current_num_beats)
