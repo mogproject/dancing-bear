@@ -80,19 +80,20 @@ class BPMRecorder:
                 self._play_upbeat()
 
             elif ch == '\r':
+                # Synchronize
                 self._restart_play()
 
-            elif ch == 'q':
-                self._stop_play()
-                break
-
             elif ch == '\x1b':
-                # arrows
+                # Arrows -> Adjust BPM
                 ch2 = self.term.getch()  # expected to be '['
                 ch3 = self.term.getch()
                 d = {'A': 1, 'B': -1, 'C': 10, 'D': -10}.get(ch3, 0)
                 self.current_bpm = max(min(self.current_bpm + d, self.MAX_BPM), self.MIN_BPM)
                 self._print_message('New BPM=%d' % self.current_bpm)
+
+            elif ch == 'q':
+                self._stop_play()
+                break
 
             last_recorded = current_time
 
