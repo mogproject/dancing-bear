@@ -91,6 +91,10 @@ class BPMRecorder:
                 self.current_bpm = max(min(self.current_bpm + d, self.MAX_BPM), self.MIN_BPM)
                 self._print_message('New BPM=%d' % self.current_bpm)
 
+            elif '1' < ch and ch < '9':
+                self.current_num_beats = ord(ch) - ord('0')
+                self._print_message('New Number of Beats=%d' % self.current_num_beats)
+
             elif ch == 'q':
                 self._stop_play()
                 break
@@ -99,7 +103,8 @@ class BPMRecorder:
 
     def _print_header(self):
         self.term.clear()
-        print('[Q] Quit   [K] Start/stop recording   [J] Record upbeat  [Enter] Sync/Start\n')
+        print('[Q] Quit             [K] Start/stop recording  [J] Record upbeat')
+        print('[1-9] Change #beats  [arrows] Change BPM       [Enter] Sync/Start\n')
 
     def _print_message(self, message):
         self._print_header()
