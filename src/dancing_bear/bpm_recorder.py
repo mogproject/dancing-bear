@@ -15,6 +15,8 @@ class BPMRecorder:
         self.midi_controller = midi_controller
         self.bear_controller = bear_controller
         self.current_proc = None
+        self.current_bpm = 120
+        self.current_num_beats = 0
         self._print_header()
 
     def loop(self):
@@ -58,8 +60,7 @@ class BPMRecorder:
                 else:
                     # ok
                     self._print_message('Playing: BPM=%d, #Beats=%d\n' % (bpm, num_beats))
-                    self.current_proc = Process(target=BPMRecorder._start_play, args=[self, bpm, num_beats])
-                    self.current_proc.start()
+                    self._start_play(bpm, num_beats)
                 count = 0
 
             elif ch == 'j' and count == 0:
@@ -74,6 +75,9 @@ class BPMRecorder:
                 print(count)
                 self._play_upbeat()
 
+            elif ch == 's':
+                self._restart_play()
+
             elif ch == 'q':
                 self._stop_play()
                 break
@@ -82,7 +86,7 @@ class BPMRecorder:
 
     def _print_header(self):
         self.term.clear()
-        print('[Q] Quit   [K] Start/stop recording   [J] Record upbeat\n')
+        print('[Q] Quit   [K] Start/stop recording   [J] Record upbeat  [S] Sync/Start\n')
 
     def _print_message(self, message):
         self._print_header()
@@ -102,9 +106,17 @@ class BPMRecorder:
             self.bear_controller.play_upbeat()
 
     def _start_play(self, bpm, num_beats):
-        start_sequence(self.bear_controller, self.midi_controller, bpm, num_beats)
+        self.current_proc = Process(target=start_sequence, args=[self.bear_controller, self.midi_controller, bpm, num_beats])
+        self.current_bpm = bpm
+        self.current_num_beats = num_beats
+        self.current_proc.start()
 
     def _stop_play(self):
-        if self.current_proc is not None:
+        if self.current_proc:
             self.current_proc.terminate()
             self.current_proc = None
+
+    def _restart_play(self):
+        if self.current_proc:
+            self._stop_play()
+            self._start_play(self.current_bpm, self.current_num_beats)
