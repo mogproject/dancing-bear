@@ -113,7 +113,9 @@ int get_max_angle() {
 void flash_beat(bool is_downbeat, unsigned long current_millis) {
   // digitalWrite(LED_BUILTIN, HIGH);
   // digitalWrite(is_downbeat ? RED : BLUE, HIGH);
-  digitalWrite(is_downbeat ? LED_1 : LED_2, HIGH);
+  // digitalWrite(is_downbeat ? LED_1 : LED_2, HIGH);
+  digitalWrite(LED_1, HIGH);
+  digitalWrite(LED_2, HIGH);
   start_servo(current_millis);
   (is_downbeat ? previous_blink_downbeat : previous_blink_upbeat) = current_millis;
 }
@@ -130,7 +132,9 @@ void stop_beat() {
 void stop_blink(bool is_downbeat) {
   // digitalWrite(LED_BUILTIN, LOW);
   // digitalWrite(is_downbeat ? RED : BLUE, LOW);
-  digitalWrite(is_downbeat ? LED_1 : LED_2, LOW);
+  // digitalWrite(is_downbeat ? LED_1 : LED_2, LOW);
+  digitalWrite(LED_1, LOW);
+  digitalWrite(LED_2, LOW);
   (is_downbeat ? previous_blink_downbeat : previous_blink_upbeat) = 0;
 }
 
