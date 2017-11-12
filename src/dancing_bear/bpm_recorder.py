@@ -12,10 +12,11 @@ class BPMRecorder:
     DEFAULT_BPM = 120
     DEFAULT_NUM_BEATS = 4
 
-    def __init__(self, term, midi_controller=None, bear_controller=None, initial_bpm=None, initial_num_beats=None):
+    def __init__(self, term, midi_controller=None, bear_controller=None, gui_controller=None, initial_bpm=None, initial_num_beats=None):
         self.term = term
         self.midi_controller = midi_controller
         self.bear_controller = bear_controller
+        self.gui_controller = gui_controller
         self.current_proc = None
         self.current_bpm = self.DEFAULT_BPM if initial_bpm is None else max(min(initial_bpm, self.MAX_BPM), self.MIN_BPM)
         self.current_num_beats = self.DEFAULT_NUM_BEATS if initial_num_beats is None else max(initial_num_beats, 1)
@@ -124,7 +125,7 @@ class BPMRecorder:
             self.bear_controller.play_upbeat()
 
     def _start_play(self, bpm, num_beats):
-        self.current_proc = Process(target=start_sequence, args=[self.bear_controller, self.midi_controller, bpm, num_beats])
+        self.current_proc = Process(target=start_sequence, args=[self.bear_controller, self.midi_controller, self.gui_controller, bpm, num_beats])
         self.current_bpm = bpm
         self.current_num_beats = num_beats
         self.current_proc.start()

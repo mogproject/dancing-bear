@@ -6,6 +6,7 @@ from mog_commons.terminal import TerminalHandler
 from .bear_controller import BearController
 from .midi_controller import MidiController
 from .bpm_recorder import BPMRecorder
+from .gui_controller import GUIController
 
 
 def main():
@@ -32,8 +33,11 @@ def main():
         except Exception:
             pass
 
-        rec = BPMRecorder(t, mc, bc, options.bpm, options.beat)
+        gc = GUIController()
+
+        rec = BPMRecorder(t, mc, bc, gc, options.bpm, options.beat)
         rec.loop(options.bpm is not None)
+        gc.close()
     finally:
         t.restore_terminal(None, None)
 

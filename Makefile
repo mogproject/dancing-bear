@@ -20,6 +20,9 @@ dev-install:
 dev-uninstall:
 	$(PYTHON) setup.py develop -u
 
+server:
+	python -m 'http.server'
+
 run: dev-install
 	$(PROG)
 
@@ -41,5 +44,5 @@ console:
 upload:
 	$(ARDUINO) --port $(ARDUINO_PORT) --upload $(ARDUINO_SRC) 2>&1 | egrep -v '^\s*at java|JmDNS|No route to host'
 
-.PHONY: build install uninstall dev_install dev_uninstall run pep8 test coverage clean console upload
+.PHONY: build install uninstall dev_install dev_uninstall server run pep8 test coverage clean console upload
 
