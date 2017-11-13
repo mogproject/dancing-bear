@@ -7,8 +7,13 @@
     <style type="text/css">
         body {
             font-family: "Nanum Pen Script";
+            text-align: center;
             color: black;
             background-color: #f4f4f4;
+        }
+
+        div {
+            margin: 0;
         }
 
         p {
@@ -39,20 +44,53 @@
 
         #bpm-label {
             vertical-align: middle;
+            margin-left: 40px;
+            margin-top: -340px;
             width: 400px;
-            height: 400px;
         }
 
         #bpm {
             margin-top: -140px;
+            margin-bottom: -140px;
             width: 600px;
             font-size: 600px;
+        }
+
+        .container {
+            margin-top: -50px;
+        }
+
+        @keyframes heart-animation {
+            0% {
+                transform: scale(1);
+            }
+            5% {
+                transform: scale(.8);
+            }
+            40% {
+                transform: scale(2.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .heart {
+            display: inline-block;
+            text-align: center;
+            width: 16%;
+        }
+
+        .heart-animation {
+            animation-duration: 0.4s;
+            animation-name: heart-animation;
+            animation-iteration-count: 1;
         }
     </style>
 </head>
 
 <body>
-    <p>I am
+    <p>I'm
         <span class="name1">Dancing Bear </span>
         <span class="name2">Julie!</span>
     </p>
@@ -60,7 +98,22 @@
         <span id="bpm-label">Dancing at BPM:</span>
         <span id="bpm">???</span>
     </p>
-    <p id="beat-display">beat</p>
+    <div class="container">
+        <div class="heart"></div>
+        <div id="heart1" class="heart">
+            <img id="heart-img1" src="heart.png" width="100px">
+        </div>
+        <div id="heart2" class="heart">
+            <img id="heart-img2" src="heart.png" width="100px">
+        </div>
+        <div id="heart3" class="heart">
+            <img id="heart-img3" src="heart.png" width="100px">
+        </div>
+        <div id="heart4" class="heart">
+            <img id="heart-img4" src="heart.png" width="100px">
+        </div>
+        <div class="heart"></div>
+    </div>
 
     <input type="button" id="beat1" onclick="setBeat(1);" />
     <input type="button" id="beat2" onclick="setBeat(2);" />
@@ -68,8 +121,16 @@
     <input type="button" id="beat4" onclick="setBeat(4);" />
 
     <script>
+        (function () {
+            for (var i = 1; i <= 4; ++i) {
+                document.getElementById("heart-img" + i).addEventListener('webkitAnimationEnd', function () {
+                    this.className = "";
+                }, false);
+            }
+        })();
+
         function setBeat(n) {
-            document.getElementById("beat-display").innerHTML = n;
+            document.getElementById("heart-img" + n).className = "heart-animation"
         };
     </script>
 </body>
