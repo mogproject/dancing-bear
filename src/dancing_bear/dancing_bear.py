@@ -37,9 +37,9 @@ def main():
 
         rec = BPMRecorder(t, mc, bc, gc, options.bpm, options.beat)
         rec.loop(options.bpm is not None)
+        gc.close()
     finally:
         t.restore_terminal(None, None)
-
 
 def get_parser():
     """

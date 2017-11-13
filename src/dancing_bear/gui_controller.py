@@ -9,6 +9,7 @@ class GUIController:
         if ret:
             raise RuntimeError('Failed to open URL: %s' % url)
         tab_id = out.splitlines(False)[0].split(b' ')[1]
+        self.executable = executable
         self.tab_id = tab_id
         self.cmd_prefix = [executable, 'execute']
 
@@ -26,3 +27,6 @@ class GUIController:
 
     def _execute_command(self, cmd):
         capture_command(args=self.cmd_prefix + cmd + ['-t', self.tab_id])
+    
+    def close(self):
+        capture_command(args=[self.executable, 'close', '-w'])
