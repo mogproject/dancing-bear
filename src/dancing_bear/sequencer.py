@@ -17,7 +17,7 @@ def start_sequence(bear_controller, midi_controller, gui_controller, bpm, num_be
     loop.call_soon(play_beat, loop, bear_controller, midi_controller, gui_controller, loop.time(), bpm, num_beats, 0)
 
     try:
-        gui_controller.send_bpm(bpm)
+        gui_controller.send_bpm(bpm, num_beats)
         loop.run_forever()
     except KeyboardInterrupt:
         pass

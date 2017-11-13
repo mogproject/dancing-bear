@@ -52,7 +52,7 @@
         #bpm {
             margin-top: -140px;
             margin-bottom: -140px;
-            width: 600px;
+            width: 670px;
             font-size: 600px;
         }
 
@@ -119,18 +119,37 @@
     <input type="button" id="beat2" onclick="setBeat(2);" />
     <input type="button" id="beat3" onclick="setBeat(3);" />
     <input type="button" id="beat4" onclick="setBeat(4);" />
+    <input type="button" id="beat5" onclick="setBeat(5);" />
+    <input type="button" id="beat6" onclick="setBeat(6);" />
+    <input type="button" id="beat7" onclick="setBeat(7);" />
+    <input type="button" id="beat8" onclick="setBeat(8);" />
+
+    <span id="num-beats" style="display:none;"></span>
 
     <script>
-        (function () {
+        window.onload = function () {
             for (var i = 1; i <= 4; ++i) {
                 document.getElementById("heart-img" + i).addEventListener('webkitAnimationEnd', function () {
                     this.className = "";
                 }, false);
             }
-        })();
+        };
 
         function setBeat(n) {
-            document.getElementById("heart-img" + n).className = "heart-animation"
+            var delay = 350;
+            var bpm = document.getElementById("bpm").textContent
+            var numBeats = document.getElementById("num-beats").textContent
+            var msPerBeat = 60000 / bpm;
+            var offset = Math.floor(delay / msPerBeat);
+            // var offset = 0;
+            var nxt = (n + offset) % numBeats % 6;
+            var timeout = (offset + 1) * msPerBeat - delay;
+
+            window.setTimeout(startAnimation, timeout, 4 <= nxt ? 7 - nxt : nxt + 1);
+        };
+
+        function startAnimation(n) {
+            document.getElementById("heart-img" + Math.min(4, n)).className = "heart-animation";
         };
     </script>
 </body>

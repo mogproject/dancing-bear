@@ -18,13 +18,13 @@ class GUIController:
         self._play_beat(1)
 
     def play_upbeat(self):
-        self._play_beat(min(4, self.beat + 1))
+        self._play_beat(self.beat + 1)
 
-    def send_bpm(self, bpm):
-        self._execute_command(['document.getElementById("bpm").innerHTML = "%s";' % bpm])
+    def send_bpm(self, bpm, num_beats):
+        self._execute_command(['document.getElementById("bpm").innerHTML="%s";document.getElementById("num-beats").innerHTML="%s";' % (bpm, num_beats)])
 
     def stop_play(self):
-        self.send_bpm('???')
+        self.send_bpm('???', 4)
 
     def _play_beat(self, next_beat):
         self._execute_command(['document.getElementById("beat%d").click();' % next_beat])
