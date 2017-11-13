@@ -21,6 +21,10 @@
             display: inline-block;
         }
 
+        input {
+            display: none;
+        }
+
         .name1 {
             font-weight: bold;
             color: #ff8080;
@@ -56,7 +60,18 @@
         <span id="bpm-label">Dancing at BPM:</span>
         <span id="bpm">???</span>
     </p>
+    <p id="beat-display">beat</p>
 
+    <input type="button" id="beat1" onclick="setBeat(1);" />
+    <input type="button" id="beat2" onclick="setBeat(2);" />
+    <input type="button" id="beat3" onclick="setBeat(3);" />
+    <input type="button" id="beat4" onclick="setBeat(4);" />
+
+    <script>
+        function setBeat(n) {
+            document.getElementById("beat-display").innerHTML = n;
+        };
+    </script>
 </body>
 
 </html>
