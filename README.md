@@ -2,15 +2,15 @@
 
 Dancing Bear
 
+## Prerequisites
+
+- MaxOS
+- Google Chrome
+- chrome-cli
+- SimpleSynth
 
 ## Setup
 
-- Install and launch SimpleSynth
-
-```
-brew install gbevin/tools/sendmidi
-
-```
 
 ## Testing
 

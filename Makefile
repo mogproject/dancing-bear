@@ -41,8 +41,11 @@ clean:
 console:
 	cd src && $(PYTHON)
 
+gui:
+	open -a 'Google Chrome' 'http://localhost:8000/bpm.html'
+
 upload:
 	$(ARDUINO) --port $(ARDUINO_PORT) --upload $(ARDUINO_SRC) 2>&1 | egrep -v '^\s*at java|JmDNS|No route to host'
 
-.PHONY: build install uninstall dev_install dev_uninstall server run pep8 test coverage clean console upload
+.PHONY: build install uninstall dev_install dev_uninstall server run pep8 test coverage clean console gui upload
 

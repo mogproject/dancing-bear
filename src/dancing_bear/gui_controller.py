@@ -1,21 +1,25 @@
+from mog_commons.command import capture_command
+
 
 class GUIController:
-    def __init__(self, data_path='/var/tmp/dancing-bear.dat'):
-        self.data = open(data_path, 'wb')
-        self.current_beat = 1
+    def __init__(self, url='http://localhost:8000/bpm.html', executable = '/usr/local/bin/chrome-cli'):
+        cmd = [executable, 'open', url]
+        ret, out, err = capture_command(cmd)
+
+        if ret:
+            raise RuntimeError('Failed to open URL: %s' % url)
+        tab_id = out.splitlines(False)[0].split(b' ')[1]
+        self.tab_id = tab_id
+        self.cmd_prefix = [executable, 'execute']
 
     def play_downbeat(self):
-        self.current_beat = 1
-        self.data.write(bytearray([self.current_beat]))
-        self.data.flush()
+        pass
 
     def play_upbeat(self):
-        self.current_beat += 1
-        self.data.write(bytearray([self.current_beat]))
-        self.data.flush()
+        pass
 
     def send_bpm(self, bpm):
-        self.data.write(bytearray([bpm]))
+        self._execute_command(['document.getElementById("bpm").innerHTML = "%s";' % bpm])
 
-    def close(self):
-        self.data.close()
+    def _execute_command(self, cmd):
+        capture_command(args=self.cmd_prefix + cmd + ['-t', self.tab_id])
