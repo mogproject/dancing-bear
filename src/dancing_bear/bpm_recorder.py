@@ -135,6 +135,7 @@ class BPMRecorder:
         if self.current_proc:
             self.current_proc.terminate()
             self.current_proc = None
+        self.gui_controller.stop_play()
 
     def _restart_play(self):
         self._stop_play()

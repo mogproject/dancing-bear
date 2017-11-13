@@ -21,5 +21,8 @@ class GUIController:
     def send_bpm(self, bpm):
         self._execute_command(['document.getElementById("bpm").innerHTML = "%s";' % bpm])
 
+    def stop_play(self):
+        self.send_bpm('???')
+
     def _execute_command(self, cmd):
         capture_command(args=self.cmd_prefix + cmd + ['-t', self.tab_id])
