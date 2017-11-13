@@ -9,12 +9,10 @@ Dancing Bear
 - chrome-cli
 - SimpleSynth
 
-## Setup
+## How to Run
 
-
-## Testing
-
-```
-make run
-```
+- Launch SimpleSynth
+- Connect Arduino via USB
+- Run `make server`
+- Run `make run` (first time) or `dancing-bear`
 
