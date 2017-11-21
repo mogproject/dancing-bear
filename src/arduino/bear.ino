@@ -14,7 +14,7 @@ const int SERVO = 2;
 const int LED_1 = 9;
 const int LED_2 = 8;
 
-const int SERVO_BASE_ANGLE = 60;
+const int SERVO_BASE_ANGLE = 40;
 const int SERVO_MAX_ANGLE = 60;
 
 const int BLINK_INTERVAL = 150; // in milliseconds
